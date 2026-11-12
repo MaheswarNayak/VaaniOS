@@ -1,0 +1,462 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#06070a" />
+  <meta name="description" content="VaaniOS — Dark-Mode Voice Ledger & Financial Intelligence System." />
+  <title>VaaniOS — Voice Ledger Engine</title>
+
+  <!-- Google Fonts: Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+
+  <!-- html2pdf.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="app-shell">
+
+    <!-- ═══════════════════════════════ SIDEBAR ═══════════════════════════════ -->
+    <aside class="sidebar" aria-label="Navigation">
+      <div class="sidebar-top">
+        <a class="brand" href="#overview" aria-label="VaaniOS home">
+          <span class="brand-mark" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+            </svg>
+          </span>
+          <div class="brand-copy">
+            <span class="brand-name">vaani<strong>os</strong></span>
+            <span class="brand-sub">LEDGER ENGINE</span>
+          </div>
+        </a>
+
+        <div class="nav-section-title">WORKSPACE</div>
+        <nav class="nav-list">
+          <a class="nav-link active" href="#overview">
+            <i data-lucide="layout-grid" class="nav-icon"></i>
+            <span>Overview</span>
+            <span class="nav-active-dot"></span>
+          </a>
+          <a class="nav-link" href="#transactions">
+            <i data-lucide="receipt-text" class="nav-icon"></i>
+            <span>Transactions</span>
+          </a>
+          <a class="nav-link" href="#voice-activity">
+            <i data-lucide="activity" class="nav-icon"></i>
+            <span>Activity Log</span>
+          </a>
+        </nav>
+      </div>
+
+      <div class="sidebar-bottom">
+        <div class="quick-status-card">
+          <div class="status-indicator-dot"></div>
+          <div class="quick-status-text">
+            <strong>Voice Engine Active</strong>
+            <small>Gnani Prisma &amp; Timbre</small>
+          </div>
+        </div>
+
+        <div class="profile-row">
+          <div class="avatar">VO</div>
+          <div class="profile-copy">
+            <strong>Demo Workspace</strong>
+            <small>Local Instance</small>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ═══════════════════════════════ MAIN CONTENT ═══════════════════════════════ -->
+    <main class="main-content" id="overview">
+
+      <!-- TOPBAR -->
+      <header class="topbar">
+        <div class="topbar-left">
+          <div class="mobile-brand">
+            <span class="brand-mark small-mark" aria-hidden="true">V</span>
+            <span class="brand-name">vaani<strong>os</strong></span>
+          </div>
+          <div class="breadcrumb">
+            <span class="crumb-root">Finance</span>
+            <span class="crumb-slash">/</span>
+            <span class="crumb-current">Daily Ledger</span>
+          </div>
+        </div>
+
+        <div class="topbar-actions">
+          <span id="connectionBadge" class="connection-badge offline">
+            <span class="status-dot"></span>
+            <span id="connectionText">Backend not connected</span>
+          </span>
+
+          <div class="action-divider"></div>
+
+          <button class="icon-button" id="themeToggleBtn" type="button" aria-label="Toggle dark/light theme" title="Toggle Theme">
+            <i data-lucide="sun" id="themeIcon"></i>
+          </button>
+
+          <button class="icon-button" id="pdfButton" type="button" aria-label="Export PDF" title="Export PDF Report">
+            <i data-lucide="file-down"></i>
+          </button>
+
+          <button class="icon-button" id="waButton" type="button" aria-label="Share summary on WhatsApp" title="Share via WhatsApp">
+            <i data-lucide="share-2"></i>
+          </button>
+
+          <button class="icon-button" id="refreshButton" type="button" aria-label="Refresh dashboard data" title="Sync Ledger">
+            <i data-lucide="rotate-cw"></i>
+          </button>
+        </div>
+      </header>
+
+      <div class="page-wrap" id="dashboardContent">
+
+        <!-- HEADER ROW -->
+        <section class="page-header">
+          <div class="header-titles">
+            <h1>Business Overview</h1>
+            <p class="page-subtitle">Real-time revenue, expense tracking, and natural voice entry.</p>
+          </div>
+          <div class="date-picker-wrap">
+            <i data-lucide="calendar" class="date-picker-icon"></i>
+            <input type="date" id="datePicker" class="date-input" aria-label="Select date" />
+            <span id="todayDate" class="date-display-badge"></span>
+          </div>
+        </section>
+
+        <!-- MODE NOTICE (Non-intrusive status pill) -->
+        <div class="mode-notice" id="modeNotice">
+          <i data-lucide="info" class="notice-icon"></i>
+          <span><strong>Preview Mode</strong> — showing simulated figures until local backend connects.</span>
+        </div>
+
+        <!-- METRIC CARDS -->
+        <section class="metrics-grid" aria-label="Key Performance Indicators">
+          <article class="metric-card">
+            <div class="metric-head">
+              <span class="metric-label">Today's Sales</span>
+              <span class="metric-icon-badge sales">
+                <i data-lucide="arrow-up-right"></i>
+              </span>
+            </div>
+            <div class="metric-value positive" id="salesTotal">₹ 12,450</div>
+            <div class="metric-foot">
+              <span class="metric-caption">Gross recorded income</span>
+              <span class="metric-pill pill-sales">INFLOW</span>
+            </div>
+          </article>
+
+          <article class="metric-card">
+            <div class="metric-head">
+              <span class="metric-label">Today's Expenses</span>
+              <span class="metric-icon-badge expense">
+                <i data-lucide="arrow-down-right"></i>
+              </span>
+            </div>
+            <div class="metric-value expense" id="expenseTotal">₹ 4,280</div>
+            <div class="metric-foot">
+              <span class="metric-caption">Operational spending</span>
+              <span class="metric-pill pill-expense">OUTFLOW</span>
+            </div>
+          </article>
+
+          <article class="metric-card balance-card">
+            <div class="metric-head">
+              <span class="metric-label">Net Balance</span>
+              <span class="metric-icon-badge balance">
+                <i data-lucide="wallet"></i>
+              </span>
+            </div>
+            <div class="metric-value balance" id="netTotal">₹ 8,170</div>
+            <div class="metric-foot">
+              <span class="metric-caption">Sales minus expenses</span>
+              <span class="metric-pill pill-balance">NET CASH</span>
+            </div>
+          </article>
+        </section>
+
+        <!-- 7-DAY ANALYTICS CHART -->
+        <section class="chart-section">
+          <div class="chart-card">
+            <div class="chart-header">
+              <div class="chart-title-group">
+                <h2>7-Day Cashflow Trajectory</h2>
+                <span class="chart-sub">Multi-Vector Neon Area Analytics</span>
+              </div>
+              <div class="chart-legend-custom">
+                <span class="legend-item"><span class="legend-dot dot-sales"></span><span>Sales</span></span>
+                <span class="legend-item"><span class="legend-dot dot-expenses"></span><span>Expenses</span></span>
+                <span class="legend-item"><span class="legend-dot dot-net"></span><span>Net Flow</span></span>
+              </div>
+            </div>
+            <div class="chart-wrap">
+              <canvas id="weeklyChart"></canvas>
+            </div>
+          </div>
+        </section>
+
+        <!-- WORK GRID: Voice Console + Live Feed -->
+        <section class="work-grid">
+
+          <!-- VOICE CONSOLE -->
+          <article class="voice-card" id="voice-console">
+            <div class="card-head">
+              <div>
+                <h2>Voice Command</h2>
+                <p class="card-description">Speak naturally in Hindi, English, or Hinglish to log transactions.</p>
+              </div>
+              <span class="live-pill">
+                <span class="pulse-dot"></span>
+                <span>AI VOICE</span>
+              </span>
+            </div>
+
+            <!-- Precision Audio Stage -->
+            <div class="voice-stage" id="voiceStage">
+              <div class="mic-halo">
+                <button class="mic-button" id="micButton" type="button" aria-label="Start voice recording">
+                  <i data-lucide="mic"></i>
+                </button>
+              </div>
+
+              <!-- Dynamic Audio Waveform Bars -->
+              <div class="voice-wave" id="voiceWave" aria-hidden="true">
+                <span></span><span></span><span></span><span></span><span></span>
+                <span></span><span></span><span></span><span></span><span></span>
+                <span></span><span></span><span></span><span></span><span></span>
+                <span></span><span></span><span></span><span></span><span></span>
+              </div>
+            </div>
+
+            <div class="voice-feedback">
+              <strong id="voiceStatusTitle">Tap to Record</strong>
+              <span id="voiceStatusText">Press the microphone to start speaking your command.</span>
+            </div>
+
+            <div class="voice-actions">
+              <button class="btn btn-primary" id="mainVoiceButton" type="button">
+                <i data-lucide="mic" class="btn-icon"></i>
+                <span>Start recording</span>
+              </button>
+            </div>
+
+            <!-- Quick Command Prompts -->
+            <div class="try-prompts">
+              <span class="prompts-label">QUICK PROMPTS:</span>
+              <button type="button" class="prompt-chip" data-prompt="Aaj 500 rupaye ki sale hui.">
+                <code>Sale ₹500</code> "Aaj ₹500 ki sale hui"
+              </button>
+              <button type="button" class="prompt-chip" data-prompt="Aaj 200 rupaye ka kharcha hua.">
+                <code>Expense ₹200</code> "₹200 ka kharcha hua"
+              </button>
+            </div>
+          </article>
+
+          <!-- RIGHT COLUMN: Transcript & Action Confirmation -->
+          <div class="right-column">
+            <article class="transcript-card">
+              <div class="card-head compact">
+                <div>
+                  <h2>Live Interpretation</h2>
+                  <p class="card-sub">Automatic speech recognition &amp; parsing</p>
+                </div>
+                <span class="transcript-status" id="transcriptStatus">IDLE</span>
+              </div>
+
+              <div class="transcript-body" id="transcriptBody">
+                <div class="empty-transcript-icon">
+                  <i data-lucide="audio-lines"></i>
+                </div>
+                <p>Spoken audio transcript will appear here in real time.</p>
+              </div>
+
+              <!-- Action Confirmation Card -->
+              <div class="intent-preview" id="intentPreview" hidden>
+                <div class="intent-heading">
+                  <span class="intent-dot"></span>
+                  <strong id="intentTitle">Action Interpreted</strong>
+                </div>
+                <div class="intent-detail" id="intentDetail"></div>
+                <p class="confirmation-note" id="confirmationNote" hidden>
+                  Please confirm this transaction before it is permanently committed to the ledger.
+                </p>
+                <div class="intent-actions" id="intentActions" hidden>
+                  <button class="btn btn-emerald btn-sm" id="confirmAction" type="button">
+                    <i data-lucide="check"></i> Confirm &amp; Save
+                  </button>
+                  <button class="btn btn-ghost btn-sm" id="cancelAction" type="button">
+                    Cancel
+                  </button>
+                </div>
+              </div>
+
+              <!-- Voice Audio Reply Row -->
+              <div class="reply-row">
+                <div class="reply-icon-wrap">
+                  <i data-lucide="volume-2"></i>
+                </div>
+                <div class="reply-text-wrap">
+                  <strong>Audio Feedback</strong>
+                  <small id="replyCaption">No speech synthesized yet.</small>
+                </div>
+                <button class="play-button" id="playReplyButton" type="button" disabled aria-label="Play audio reply" title="Play Spoken Response">
+                  <i data-lucide="play"></i>
+                </button>
+              </div>
+              <audio id="replyAudio" preload="none"></audio>
+            </article>
+          </div>
+        </section>
+
+        <!-- TRANSACTIONS LEDGER TABLE -->
+        <section class="transactions-section" id="transactions">
+          <div class="section-header-bar">
+            <div>
+              <h2>Recent Transactions</h2>
+              <p>Chronological record of sales and expenses logged in this session.</p>
+            </div>
+            <button class="btn btn-ghost btn-sm" id="viewAllButton" type="button">
+              <span>View Activity Log</span>
+              <i data-lucide="arrow-down"></i>
+            </button>
+          </div>
+
+          <div class="table-card">
+            <div class="table-scroll">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>TRANSACTION</th>
+                    <th>TYPE</th>
+                    <th>CATEGORY</th>
+                    <th>TIME</th>
+                    <th class="align-right">AMOUNT</th>
+                    <th>STATUS</th>
+                  </tr>
+                </thead>
+                <tbody id="transactionsBody">
+                  <tr>
+                    <td>
+                      <div class="transaction-name">
+                        <span class="transaction-icon sale"><i data-lucide="arrow-up-right"></i></span>
+                        <span>
+                          <strong>Counter sale</strong>
+                          <small>Sample preview record</small>
+                        </span>
+                      </div>
+                    </td>
+                    <td><span class="type-pill sale-type">Sale</span></td>
+                    <td><span class="category-chip chip-general">General</span></td>
+                    <td class="tabular-time">11:42 AM</td>
+                    <td class="align-right amount-positive">+ ₹ 2,500</td>
+                    <td><span class="status-pill sample">SAMPLE</span></td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <div class="transaction-name">
+                        <span class="transaction-icon expense"><i data-lucide="arrow-down-right"></i></span>
+                        <span>
+                          <strong>Stock purchase</strong>
+                          <small>Sample preview record</small>
+                        </span>
+                      </div>
+                    </td>
+                    <td><span class="type-pill expense-type">Expense</span></td>
+                    <td><span class="category-chip chip-utility">Utility</span></td>
+                    <td class="tabular-time">10:18 AM</td>
+                    <td class="align-right amount-negative">− ₹ 800</td>
+                    <td><span class="status-pill sample">SAMPLE</span></td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <div class="transaction-name">
+                        <span class="transaction-icon sale"><i data-lucide="arrow-up-right"></i></span>
+                        <span>
+                          <strong>Morning sales</strong>
+                          <small>Sample preview record</small>
+                        </span>
+                      </div>
+                    </td>
+                    <td><span class="type-pill sale-type">Sale</span></td>
+                    <td><span class="category-chip chip-food">Food</span></td>
+                    <td class="tabular-time">09:06 AM</td>
+                    <td class="align-right amount-positive">+ ₹ 1,250</td>
+                    <td><span class="status-pill sample">SAMPLE</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="table-footer">
+              <span id="transactionCount" class="record-counter">3 transactions</span>
+              <span class="footer-note">
+                <i data-lucide="shield-check" class="footer-note-icon"></i>
+                Transactions persist in SQLite database
+              </span>
+            </div>
+          </div>
+        </section>
+
+        <!-- AUDIT & ACTIVITY LOG -->
+        <section class="activity-section" id="voice-activity">
+          <div class="section-header-bar">
+            <div>
+              <h2>System Audit Log</h2>
+              <p>Operational event log and voice interaction telemetry.</p>
+            </div>
+            <button class="btn btn-ghost btn-sm" id="clearActivityButton" type="button">
+              <i data-lucide="trash-2"></i>
+              <span>Clear log</span>
+            </button>
+          </div>
+
+          <div class="activity-card">
+            <div class="activity-list" id="activityList">
+              <div class="activity-item">
+                <span class="activity-indicator info"></span>
+                <div class="activity-content">
+                  <strong>System Initialized</strong>
+                  <p>VaaniOS ready. Audio pipeline awaiting input.</p>
+                </div>
+                <time>JUST NOW</time>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- FOOTER -->
+        <footer class="app-footer">
+          <div class="footer-left">
+            <span class="footer-brand">vaani<strong>os</strong></span>
+            <span class="footer-sep">·</span>
+            <span>Voice Ledger Architecture</span>
+          </div>
+          <div class="footer-right">
+            <span>Powered by Gnani.ai Prisma &amp; Timbre</span>
+            <span class="footer-sep">·</span>
+            <span class="footer-version">v2.4.0</span>
+          </div>
+        </footer>
+
+      </div><!-- /page-wrap -->
+    </main>
+  </div>
+
+  <!-- TOAST NOTIFICATION STACK -->
+  <div class="toast-container" id="toastContainer" aria-live="polite"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>

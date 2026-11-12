@@ -58,4 +58,4 @@ Open a new terminal window, navigate to the frontend directory, and serve the st
 - `GET /api/summary/weekly` - Fetches aggregated 7-day data formatted for Chart.js.
 
 ## 👨‍💻 Author
-Built with ❤️ by Maheswar Nayak
+Built with by Maheswar Nayak
